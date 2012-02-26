@@ -90,7 +90,14 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
     SCNetworkReachabilityRef ref = SCNetworkReachabilityCreateWithName(NULL, [hostname UTF8String]);
     if (ref) 
     {
-        return [[[self alloc] initWithReachabilityRef:ref] autorelease];
+        id reachability = [[self alloc] initWithReachabilityRef:ref];
+
+#if __has_feature(objc_arc)
+        return reachability;
+#else
+        return [reachability autorelease];
+#endif
+
     }
     
     return nil;
@@ -101,7 +108,13 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
     SCNetworkReachabilityRef ref = SCNetworkReachabilityCreateWithAddress(kCFAllocatorDefault, (const struct sockaddr*)hostAddress);
     if (ref) 
     {
-        return [[[self alloc] initWithReachabilityRef:ref] autorelease];
+        id reachability = [[self alloc] initWithReachabilityRef:ref];
+        
+#if __has_feature(objc_arc)
+        return reachability;
+#else
+        return [reachability autorelease];
+#endif
     }
     
     return nil;
@@ -155,6 +168,12 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
 #ifdef DEBUG
     NSLog(@"Reachability: dealloc");
 #endif
+    
+#if !(__has_feature(objc_arc))
+    [super dealloc];
+#endif
+
+    
 }
 
 #pragma mark - notifier methods
@@ -177,7 +196,7 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
     if (!SCNetworkReachabilitySetCallback(self.reachabilityRef, TMReachabilityCallback, &context)) 
     {
 #ifdef DEBUG
-        NSLog(@"SCNetworkReachabilitySetCallback() failed: %s\n", SCErrorString(SCError()));
+        NSLog(@"SCNetworkReachabilitySetCallback() failed: %s", SCErrorString(SCError()));
 #endif
         return NO;
     }
@@ -420,7 +439,7 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
         if(self.reachableBlock)
         {
 #ifdef DEBUG
-            NSLog(@"Reachability: blocks are not called on the main thread.\n Use dispatch_async(dispatch_get_main_queue(), ^{}] to update your UI!");
+            NSLog(@"Reachability: blocks are not called on the main thread.\n Use dispatch_async(dispatch_get_main_queue(), ^{}); to update your UI!");
 #endif
             self.reachableBlock(self);
         }
@@ -430,7 +449,7 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
         if(self.unreachableBlock)
         {
 #ifdef DEBUG
-            NSLog(@"Reachability: blocks are not called on the main thread.\n Use dispatch_async(dispatch_get_main_queue(), ^{}] to update your UI!");
+            NSLog(@"Reachability: blocks are not called on the main thread.\n Use dispatch_async(dispatch_get_main_queue(), ^{}); to update your UI!");
 #endif
             self.unreachableBlock(self);
         }
