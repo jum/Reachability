@@ -68,7 +68,7 @@ static NSString *reachabilityFlags(SCNetworkReachabilityFlags flags)
 }
 
 //Start listening for reachability notifications on the current run loop
-static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info) 
+static void TM1ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info)
 {
 #pragma unused (target)
 #if __has_feature(objc_arc)
@@ -222,7 +222,7 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
     context.info = (void *)self;
 #endif
     
-    if (!SCNetworkReachabilitySetCallback(self.reachabilityRef, TMReachabilityCallback, &context)) 
+    if (!SCNetworkReachabilitySetCallback(self.reachabilityRef, TM1ReachabilityCallback, &context))
     {
 #ifdef DEBUG
         NSLog(@"SCNetworkReachabilitySetCallback() failed: %s", SCErrorString(SCError()));
