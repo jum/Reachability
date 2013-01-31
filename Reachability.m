@@ -513,8 +513,8 @@ static void TM1ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRe
 
 - (NSString *) description;
 {
-    NSString *description = [NSString stringWithFormat:@"<%@: %#x; isReachable: %s; current reachability flags: %@>",
-                             NSStringFromClass([self class]), (unsigned int) self, (self.isReachable ? "YES" : "NO" ), self.currentReachabilityFlags];
+    NSString *description = [NSString stringWithFormat:@"<%@: %#x>",
+                             NSStringFromClass([self class]), (unsigned int) self];
     return description;
 }
 
